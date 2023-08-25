@@ -1,0 +1,37 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+.fundo {
+    background-color: lightblue;
+}
+.fundoPagina {
+    background-color:aliceblue;
+}
+/* Adicione cores alternadas para as linhas */
+.maisdemil {
+  background-color:red
+}
+/*tr:nth-child(even) {
+    background-color: white;
+}
+
+tr:nth-child(odd) {
+    background-color: whitesmoke;
+}*/
+
+

@@ -1,0 +1,29 @@
+﻿<div class="modal-content">
+	<div class="modal-header">
+		<h1 class="modal-title fs-5">Editar tarefa</h1>
+	</div>
+	<div class="modal-body">
+		<input type="hidden" id="editTaskId" />
+		<input type="hidden" class="form-control" id="editTaskOrdem" />
+		<div class="form-group">
+			<label>Nome:</label>
+			<input type="text" class="form-control" id="editTaskName" />
+			<span class="text-danger" id="editTaskNameError"></span>
+
+		</div>
+		<div class="form-group">
+			<label>Custo:</label>
+			<input type="text" class="form-control" id="editTaskCost" />
+		</div>
+		<div class="form-group">
+			<label>Data Limite:</label>
+			<input type="date" class="form-control" id="editTaskDate" />
+		</div>
+	</div>
+	<div class="modal-footer justify-content-between">
+		<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+		<button type="button" class="btn btn-primary" id="salvarEditar">Salvar</button>
+	</div>
+</div>
+
+

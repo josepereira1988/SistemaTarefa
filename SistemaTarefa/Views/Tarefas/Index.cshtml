@@ -1,0 +1,320 @@
+﻿@model List<Tarefa>
+
+@{
+	ViewData["Title"] = "Lista de tarefa";
+}
+
+<div class="mr-5 px-5">
+	<div class="card w-75">
+
+		<div class="px-3 py-3 fundoPagina">
+			<div class="d-flex p-3 my-2 mb-3 text-white bg-secondary rounded shadow-sm">
+
+				<div class="d-flex align-items-center mr-auto">
+					<div class="lh-100">
+						<h2 class="mb-0">Listade de tarefa</h2>
+					</div>
+					<div class="p-3">
+						<a class="btn btn-outline-light" asp-action="CriarTarefa"><i class="fa-solid fa-plus fa-2xl"></i></a>
+					</div>
+				</div>
+			</div>
+			<hr />
+			<table id="sortable-table" class="table table-striped">
+				<thead>
+					<tr class="draggable-row">
+						<th>ID</th>
+						<th>Nome</th>
+						<th>Custo</th>
+						<th>Data Limite</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var tarefa in Model)
+					{
+
+						if (tarefa.Custo > 999)
+						{
+							<tr class="sortable-row maisdemil" data-index="@tarefa.OrdemApresentacao" data-id="@tarefa.Id" draggable="true" ondragstart="drag(event)">
+								<td width="50px">@tarefa.Id</td>
+								<td width="100px">@tarefa.Nome</td>
+								<td width="100px">@tarefa.Custo.ToString("C")</td>
+								<td width="50px">@tarefa.DataLimite.ToString("dd/MM/yyyy")</td>
+								<td width="50px">
+									<div class="btn-group">
+										<button type="button" class="btn btn-danger btnmodal" data-bs-toggle="modal" data-bs-target="#excluirModal" data-taskid="@tarefa.Id" data-taskname="@tarefa.Nome">
+											<i class="fa fa-trash"></i>
+										</button>
+										<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editarModal"
+												onclick="EditModal('@tarefa.Id','@tarefa.Nome','@tarefa.Custo','@tarefa.DataLimite','@tarefa.OrdemApresentacao')">
+											<i class="fas fa-edit"></i>
+										</button>
+									</div>
+
+								</td>
+								<td hidden><input type="hidden" name="ordem" value="@tarefa.OrdemApresentacao" /></td>
+							</tr>
+						}
+						else
+						{
+							<tr class="sortable-row" data-index="@tarefa.OrdemApresentacao" data-id="@tarefa.Id" draggable="true" ondragstart="drag(event)">
+								<td width="50px">@tarefa.Id</td>
+								<td width="100px">@tarefa.Nome</td>
+								<td width="100px">@tarefa.Custo.ToString("C")</td>
+								<td width="50px">@tarefa.DataLimite.ToString("dd/MM/yyyy")</td>
+								<td width="30px">
+									<div class="btn-group">
+										<button type="button" class="btn btn-danger btnmodal" data-bs-toggle="modal" data-bs-target="#excluirModal" data-taskid="@tarefa.Id" data-taskname="@tarefa.Nome">
+											<i class="fa fa-trash"></i>
+										</button>
+										<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editarModal"
+												onclick="EditModal('@tarefa.Id','@tarefa.Nome','@tarefa.Custo','@tarefa.DataLimite','@tarefa.OrdemApresentacao')">
+											<i class="fas fa-edit"></i>
+										</button>
+									</div>
+
+								</td>
+								<td hidden><input type="hidden" name="ordem" value="@tarefa.OrdemApresentacao" /></td>
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+		<div class="card-footer d-flex justify-content-end">
+			<div class="p-3">
+				<a class="btn btn-primary" asp-action="CriarTarefa"><i class="fa-solid fa-plus fa-2xl"></i></a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Excluir -->
+<div class="modal fade" id="excluirModal" tabindex="-1" aria-labelledby="excluirModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="excluirModalLabel">Excluir tarefa</h1>
+			</div>
+			<div class="modal-body">
+				Deseja realmente excluir a tarefa "<span id="taskToDeleteName"></span>"?
+			</div>
+			<div class="modal-footer justify-content-between">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+				<a class="btn btn-danger" id="confirmDeleteButton">Sim</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Editar -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-body">
+				@Html.Partial("_EditarTarefa")
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+	<script>
+		/// Função para abrir o Modal Editar
+		function EditModal(id, nome, custo, dataLimite, ordem) {
+			$("#editTaskNameError").text("");
+			$("#editTaskId").val(id);
+			$("#editTaskName").val(nome);
+			$("#editTaskOrdem").val(ordem);
+			$("#editTaskCost").val((parseFloat(custo)).toFixed(2).replace('.', ','));
+			$("#editTaskDate").val(formatDate(dataLimite, "yyyy-MM-dd"));
+			$("#editarModal").modal("show");
+		}
+		/// Função para o campo Custo
+		function formatDate(date, format) {
+			var parts = date.split("/");
+			var year = parseInt(parts[2], 10);
+			var month = parseInt(parts[1], 10);
+			var day = parseInt(parts[0], 10);
+
+			return `${year}-${('0' + month).slice(-2)}-${('0' + day).slice(-2)}`;
+		}
+		/// Função para o campo Custo
+		$(document).ready(function () {
+			$("#editTaskCost").on("blur", function () {
+				var valor = $(this).val();
+				valor = valor.replace(/\s/g, "").replace(/\./g, "").replace(",", ".");
+				var floatValue = parseFloat(valor);
+				if (!isNaN(floatValue)) {
+					$(this).val(floatValue.toFixed(2).replace(".", ","));
+				}
+			});
+		});
+
+
+	</script>
+	<script>
+		// Função para Deletar
+		$(function () {
+
+			$(".btnmodal").click(function () {
+				var taskId = $(this).data("taskid");
+				var taskName = $(this).data("taskname");
+
+				// Set task name in modal
+				$("#taskToDeleteName").text(taskName);
+
+				var deleteUrl = '/Tarefas' + '/Delete/' + taskId;
+
+				$("#confirmDeleteButton").attr("href", deleteUrl);
+			});
+
+		});
+	</script>
+	<script>
+		$(async function () {
+			$("#sortable-table tbody").sortable({
+				helper: fixHelperModified,
+				stop: async function (event, ui) {
+					await updateOrderAsync();
+				}
+			}).disableSelection();
+
+			function fixHelperModified(e, tr) {
+				var $originals = tr.children();
+				var $helper = tr.clone();
+				$helper.children().each(function (index) {
+					$(this).width($originals.eq(index).width());
+				});
+				return $helper;
+			}
+
+			async function updateOrderAsync() {
+				var sortedRows = [];
+				$(".sortable-row").each(function () {
+					var itemId = $(this).data("id");
+					var ordem = sortedRows.length + 1
+					sortedRows.push({
+						Id: itemId,
+						Ordem: sortedRows.length + 1
+					});
+				});
+
+				try {
+					const response = await $.ajax({
+						url: '@Url.Action("UpdateOrder", "Tarefas")',
+						method: 'POST',
+						data: JSON.stringify(sortedRows),
+						contentType: 'application/json',
+						timeout: 10000
+					});
+
+
+				}
+				catch (error) {
+
+				}
+			}
+		});
+	</script>
+	<script>
+		document.getElementById('salvarEditar').addEventListener('click', async () => {
+			await salvarEditar();
+		});
+
+		async function salvarEditar() {
+			var taskId = $("#editTaskId").val();
+			var taskName = $("#editTaskName").val();
+			var taskCost = $("#editTaskCost").val().replace(",", ".");
+			var taskDate = $("#editTaskDate").val();
+			var taskOrdem = $("#editTaskOrdem").val();
+			const isSaveSucessful = await checkName(taskId, taskName);
+			if (!isSaveSucessful) {
+				Tarefa = {
+					Id: taskId,
+					Nome: taskName,
+					Custo: taskCost,
+					DataLimite: taskDate,
+					OrdemApresentacao: taskOrdem
+				};
+				console.log("Tarefa:", JSON.stringify(Tarefa));
+
+				await salvarAlteracao(Tarefa)
+				
+
+			} else {
+				$("#editTaskNameError").text("Nome já existe");
+			}
+
+		}
+
+		async function salvarAlteracao(Tarefa) {
+			try {
+				console.log(JSON.stringify(Tarefa))
+				const response = await $.ajax({
+					url: '@Url.Action("AtualizarTarefa", "Tarefas")',
+					method: 'POST',
+					data: JSON.stringify(Tarefa),
+					contentType: 'application/json',
+					timeout: 10000
+				});
+				location.reload();
+				// Handle success if needed
+			} catch (error) {
+				console.log(error);
+			}				
+		}
+
+		async function checkName(id, name) {
+			try {
+				var response = await fetch(`/Tarefas/Existe?Id=${id}&nome=${name}`);
+				var data = await response.json();
+				return data.resultado;
+			} catch (error) {
+				console.error('Erro:', error);
+				return true; // Retornar false em caso de erro
+			}
+		}
+
+						//function checkName(id, name) {
+						//	console.log("aqui");
+
+						//}
+						// Check que exite
+
+								/// Função para Salvar alteração dos campos do modaleditar
+								//function saveAndCloseModal() {
+								//	var taskId = $("#editTaskId").val();
+								//	var taskName = $("#editTaskName").val();
+								//	var taskCost = $("#editTaskCost").val();
+								//	var taskDate = $("#editTaskDate").val();
+								//	var taskOrdem = $("#editTaskOrdem").val();
+
+								//	var isSaveSuccessful = await checkName(taskId, taskName);
+								//	if (!isSaveSuccessful) {
+								//		//tarefa = {
+								//		//	Id = TaskId,
+								//		//	Nome = taskName,
+								//		//	Custo = taskCost,
+								//		//	DataLimite = taskDate,
+								//		//	OrdemApresentacao = taskOrdem
+
+								//		//}
+								//		//console.log(JSON.stringify(tarefa))
+								//		//const response = await fetch('/Tarefas/Existe', {
+								//		//	method: 'POST',
+								//		//	headers: {
+								//		//		'Content-Type': 'application/json'
+								//		//	},
+								//		//	body: JSON.stringify({ Id: id, nome: name })
+								//		//});
+
+								//	}
+								//}
+
+	</script>
+};
+
+
